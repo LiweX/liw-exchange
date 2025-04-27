@@ -17,16 +17,8 @@ services:
   backend:
     build:
       context: ./backend
+      dockerfile: Dockerfile
     container_name: exchange_backend
-    command: >
-      sh -c "
-      python manage.py migrate &&
-      python manage.py collectstatic --noinput &&
-      gunicorn backend.wsgi:application --bind 0.0.0.0:8000
-      "
-    volumes:
-      - ./backend:/app
-      - ./frontend/build:/app/frontend/build  # Montar el build del front en backend
     env_file:
       - ./backend/.env
     depends_on:
@@ -39,8 +31,6 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: exchange_frontend
-    volumes:
-      - ./frontend:/app
     ports:
       - "3000:3000"
     stdin_open: true
