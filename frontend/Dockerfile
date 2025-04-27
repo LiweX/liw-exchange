@@ -1,5 +1,4 @@
-# Usa una imagen base de Node.js
-FROM node:18-slim
+FROM node:23-slim
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
