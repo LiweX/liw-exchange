@@ -1,35 +1,51 @@
-version: '3'
+version: '3.9'
+
 services:
   db:
     image: postgres:14
+    container_name: exchange_db
+    restart: always
     environment:
       POSTGRES_DB: exchange_db
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
-    ports:
-      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-  backend:
-    build: .
-    command: python manage.py runserver 0.0.0.0:8000
-    volumes:
-      - .:/app
     ports:
-      - "8000:8000"
+      - "5432:5432"
+
+  backend:
+    build:
+      context: ./backend
+    container_name: exchange_backend
+    command: >
+      sh -c "
+      python manage.py migrate &&
+      python manage.py collectstatic --noinput &&
+      gunicorn backend.wsgi:application --bind 0.0.0.0:8000
+      "
+    volumes:
+      - ./backend:/app
+      - ./frontend/build:/app/frontend/build  # Montar el build del front en backend
+    env_file:
+      - ./backend/.env
     depends_on:
       - db
+    ports:
+      - "8000:8000"
+
   frontend:
     build:
       context: ./frontend
-    command: npm start
+      dockerfile: Dockerfile
+    container_name: exchange_frontend
     volumes:
       - ./frontend:/app
     ports:
       - "3000:3000"
+    stdin_open: true
     environment:
-      - CHOKIDAR_USEPOLLING=true  
-  
+      - CHOKIDAR_USEPOLLING=true
 
 volumes:
   postgres_data:
