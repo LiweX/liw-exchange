@@ -4,7 +4,7 @@ function Home() {
     const { user, logout } = useAuth();
 
     return (
-        <header>
+        <div className='flex flex-col items-center justify-center'>
             {user ? (
                 <>
                     <span>Hola, {user.username}</span>
@@ -13,7 +13,7 @@ function Home() {
             ) : (
                 <a href="/auth">Iniciar sesión</a>
             )}
-        </header>
+        </div>
     );
 }
 

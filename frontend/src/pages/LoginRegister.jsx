@@ -47,9 +47,9 @@ export default function LoginRegister() {
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: "2rem auto" }}>
-      <h2>{mode === "login" ? "Login" : "Registro"}</h2>
-      <form onSubmit={handleSubmit}>
+    <div className="flex flex-col items-center justify-center h-screen space-y-4 bg-gray-100">
+      <h2 className="text-3xl font-bold p-2">{mode === "login" ? "Login" : "Registro"}</h2>
+      <form className="flex flex-col space-y-2" onSubmit={handleSubmit}>
         <input
           name="username"
           placeholder="Usuario"
@@ -72,12 +72,12 @@ export default function LoginRegister() {
           onChange={handleChange}
           required
         />
-        <button type="submit">
+        <button type="submit" className="border rounded p-2 bg-blue-500 text-white">
           {mode === "login" ? "Iniciar sesión" : "Registrarse"}
         </button>
       </form>
       <p style={{ color: "red" }}>{error}</p>
-      <button onClick={() => setMode(mode === "login" ? "register" : "login")}>
+      <button className="border rounded p-2 bg-blue-500 text-white" onClick={() => setMode(mode === "login" ? "register" : "login")}>
         Cambiar a {mode === "login" ? "registro" : "login"}
       </button>
     </div>

@@ -7,7 +7,6 @@ function App() {
   return (
     <Router>
       <div>
-        <h1>Mi Aplicación</h1>
         <Routes>
           <Route path="/" element={<Home />} />  {/* Página de inicio */}
           <Route path="/auth" element={<LoginRegister />} /> {/* Página de login/registro */}
