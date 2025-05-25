@@ -1,18 +1,25 @@
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import LoginRegister from './pages/LoginRegister'; // Importar la página de login/registro
-import Home from './pages/Home'; // Ejemplo de una página adicional
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from './context/AuthContext';
+import LoginRegister from './pages/LoginRegister';
+import Dashboard from './pages/Dashboard';
+import ProtectedRoute from './components/ProtectedRoute';
 import './App.css';
 
 function App() {
+  const {token} = useAuth();
+
   return (
-    <Router>
-      <div>
+      <Router>
         <Routes>
-          <Route path="/" element={<Home />} />  {/* Página de inicio */}
-          <Route path="/auth" element={<LoginRegister />} /> {/* Página de login/registro */}
+          <Route path="/login" element={token ? <Navigate to="/dashboard" /> : <LoginRegister />} />
+          <Route path="/dashboard/*" element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="*" element={<Navigate to="/dashboard" />} />
         </Routes>
-      </div>
-    </Router>
+      </Router>
   );
 }
 

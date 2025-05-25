@@ -1,50 +1,52 @@
 import { useState } from "react";
-import { useAuth } from "../context/AuthContext"; // Asegúrate de que la ruta sea correcta
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginRegister() {
-  const [mode, setMode] = useState("login"); // "login" o "register"
+  const [mode, setMode] = useState("login");
   const [form, setForm] = useState({ username: "", email: "", password: "" });
   const [error, setError] = useState("");
   const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError("");
 
-    try {
-      if (mode === "register") {
-        const res = await fetch("/api/users/register/", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(form),
-        });
+  try {
+    if (mode === "register") {
+      const res = await fetch("/users/register/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
 
-        if (!res.ok) throw new Error("Error al registrar");
-        alert("Usuario registrado con éxito");
-        setMode("login");
-      } else {
-        const res = await fetch("/api/users/login/", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            username: form.username,
-            password: form.password,
-          }),
-        });
+      if (!res.ok) throw new Error("Error al registrar");
+      alert("Usuario registrado con éxito");
+      setMode("login");
+    } else {
+      const res = await fetch("/users/login/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: form.username,
+          password: form.password,
+        }),
+      });
 
-        if (!res.ok) throw new Error("Credenciales incorrectas");
-        const data = await res.json();
-        login(data.access);
-        alert("Login exitoso");
-      }
-    } catch (err) {
-      setError(err.message);
+      if (!res.ok) throw new Error("Credenciales incorrectas");
+      const data = await res.json();
+      login(data.access);
+      navigate("/dashboard");
     }
-  };
+  } catch (err) {
+    setError(err.message);
+  }
+};
 
   return (
     <div className="flex flex-col items-center justify-center h-screen space-y-4 bg-gray-100">

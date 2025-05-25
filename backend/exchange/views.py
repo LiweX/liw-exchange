@@ -1,7 +1,39 @@
-from django.shortcuts import render
+from rest_framework import generics, permissions
+from .models import Card, ExchangeProposal
+from .serializers import CardSerializer, ExchangeProposalSerializer
 
-# Create your views here.
-from django.http import JsonResponse
+class CardListCreateView(generics.ListCreateAPIView):
+    queryset = Card.objects.all()
+    serializer_class = CardSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
-def ping(request):
-    return JsonResponse({'message': 'pong'})
+    def get_queryset(self):
+        # Solo listar las cards del usuario autenticado
+        return Card.objects.filter(owner=self.request.user)
+
+    def perform_create(self, serializer):
+        # Asignar automáticamente el owner como el usuario que hace la request
+        serializer.save(owner=self.request.user)
+
+class ExchangeProposalListCreateView(generics.ListCreateAPIView):
+    queryset = ExchangeProposal.objects.all()
+    serializer_class = ExchangeProposalSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Solo listar las propuestas del usuario autenticado
+        return ExchangeProposal.objects.filter(proposer=self.request.user)
+
+    def perform_create(self, serializer):
+        # Ya lo hace el serializer, pero se puede reforzar acá también
+        serializer.save(proposer=self.request.user)
+
+
+class ExchangeProposalDetailView(generics.RetrieveUpdateAPIView):
+    queryset = ExchangeProposal.objects.all()
+    serializer_class = ExchangeProposalSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # El usuario solo puede ver/modificar sus propuestas
+        return ExchangeProposal.objects.filter(proposer=self.request.user)
