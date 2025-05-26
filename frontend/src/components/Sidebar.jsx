@@ -17,6 +17,7 @@ const handleLogout = () => {
       <h2 className="text-xl font-bold mb-6">liw-exchange</h2>
       <div className="flex flex-col gap-6">
       <Link to="/dashboard/cards" className="mb-4 hover:text-gray-300">Mis cartas</Link>
+      <Link to="/dashboard/available-cards" className="mb-4 hover:text-gray-300">Cartas disponibles</Link>
       <Link to="/dashboard/exchanges" className="mb-4 hover:text-gray-300">Intercambios</Link>
       <Link to="/dashboard/profile" className="mb-4 hover:text-gray-300">Mi perfil</Link>
       </div>

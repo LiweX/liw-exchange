@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
+import CardItem from "../components/CardItem";
+import CardForm from "../components/CardForm";
 
 const MyCards = () => {
   const { token } = useAuth();
   const [cards, setCards] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({ name: "", description: "", image_url: "" });
+  const [formLoading, setFormLoading] = useState(false);
 
   useEffect(() => {
     if (!token) return;
@@ -21,20 +23,38 @@ const MyCards = () => {
       .catch((err) => console.error(err));
   }, [token]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleCreateCard = (data, resetForm) => {
+    setFormLoading(true);
     axios
-      .post("/exchange/cards/", formData, {
+      .post("/exchange/cards/", data, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       })
       .then((res) => {
         setCards((prev) => [...prev, res.data]);
-        setFormData({ name: "", description: "", image_url: "" });
+        resetForm();
         setShowForm(false);
       })
-      .catch((err) => console.error(err));
+      .catch((err) => console.error(err))
+      .finally(() => setFormLoading(false));
+  };
+
+  const handleOffer = (cardId, newForTrade) => {
+    axios
+      .patch(
+        `/exchange/cards/${cardId}/`,
+        { forTrade: newForTrade },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      )
+      .then((res) => {
+        setCards((prev) =>
+          prev.map((c) => (c.id === cardId ? { ...c, forTrade: newForTrade } : c))
+        );
+      })
+      .catch((err) => alert("Error al actualizar el estado de intercambio"));
   };
 
   return (
@@ -49,50 +69,18 @@ const MyCards = () => {
         </button>
       </div>
 
-      {showForm && (
-        <form onSubmit={handleSubmit} className="bg-gray-100 p-4 rounded mb-4">
-          <input
-            type="text"
-            placeholder="Nombre"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="block w-full mb-2 p-2 border border-gray-300 rounded"
-            required
-          />
-          <input
-            type="text"
-            placeholder="Descripción"
-            value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            className="block w-full mb-2 p-2 border border-gray-300 rounded"
-          />
-          <input
-            type="text"
-            placeholder="URL de imagen"
-            value={formData.image_url}
-            onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-            className="block w-full mb-2 p-2 border border-gray-300 rounded"
-          />
-          <button
-            type="submit"
-            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-          >
-            Guardar
-          </button>
-        </form>
-      )}
-
       <div className="flex flex-row gap-14">
         {cards.map((card) => (
-          <div key={card.id} className="bg-white p-4 border rounded shadow h-96 w-60">
-            <h2 className="text-xl font-semibold">{card.name}</h2>
-            {card.image_url && (
-              <img src={card.image_url} alt={card.name} className="mt-2 h-64 object-cover" />
-            )}
-            <p className="text-gray-700">{card.description}</p>
-          </div>
+          <CardItem key={card.id} card={card} onOffer={handleOffer} />
         ))}
       </div>
+      {showForm && (
+        <CardForm
+          onSubmit={handleCreateCard}
+          onClose={() => setShowForm(false)}
+          loading={formLoading}
+        />
+      )}
     </div>
   );
 };

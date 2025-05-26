@@ -37,3 +37,20 @@ class ExchangeProposalDetailView(generics.RetrieveUpdateAPIView):
     def get_queryset(self):
         # El usuario solo puede ver/modificar sus propuestas
         return ExchangeProposal.objects.filter(proposer=self.request.user)
+
+class OfferedCardsListView(generics.ListAPIView):
+    serializer_class = CardSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Solo cartas verificadas y marcadas para intercambio
+        return Card.objects.filter(verified=True, forTrade=True)
+
+class CardDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Card.objects.all()
+    serializer_class = CardSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Solo el dueño puede modificar su carta
+        return Card.objects.filter(owner=self.request.user)

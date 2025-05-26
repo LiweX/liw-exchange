@@ -5,8 +5,10 @@ class Card(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
-    available = models.BooleanField(default=True)
+    verified = models.BooleanField(default=False)  # Aprobada por admin
+    forTrade = models.BooleanField(default=False)  # Disponible para intercambio
     image_url = models.URLField(max_length=500, null=True, blank=True)
+    
 
     def __str__(self):
         return f"{self.name} - {self.owner.username}"

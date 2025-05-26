@@ -7,7 +7,7 @@ class CardSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Card
-        fields = ['id', 'owner', 'name', 'description', 'available', 'image_url']
+        fields = ['id', 'owner', 'name', 'description', 'verified', 'forTrade', 'image_url']
 
 class ExchangeProposalSerializer(serializers.ModelSerializer):
     class Meta:
