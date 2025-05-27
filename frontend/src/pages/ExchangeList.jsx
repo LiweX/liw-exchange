@@ -9,7 +9,7 @@ const ExchangeList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [expandedId, setExpandedId] = useState(null);
-  const [modalCard, setModalCard] = useState(null);
+  const [modalCard, _setModalCard] = useState(null); // eslint-disable-line no-unused-vars
   const [forceModal, setForceModal] = useState(null);
 
   useEffect(() => {
