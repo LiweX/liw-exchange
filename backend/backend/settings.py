@@ -10,7 +10,7 @@ SECRET_KEY = config('SECRET_KEY', default='insecure-secret-key')  # fallback par
 
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,local-backend', cast=Csv())
 
 # Aplicaciones
 INSTALLED_APPS = [
@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'exchange',
     'corsheaders',
+    'users',
 ]
 
 # Middlewares
@@ -62,7 +63,7 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Base de datos
 DATABASES = {
     'default': dj_database_url.config(
-        default=f"postgres://{os.getenv('POSTGRES_USER', 'user')}:{os.getenv('POSTGRES_PASSWORD', 'password')}@{os.getenv('POSTGRES_HOST', 'db')}:{os.getenv('POSTGRES_PORT', '5432')}/{os.getenv('POSTGRES_DB', 'exchange_db')}"
+        default=f"postgres://{os.getenv('POSTGRES_USER', 'user')}:{os.getenv('POSTGRES_PASSWORD', 'password')}@{os.getenv('POSTGRES_HOST', 'localhost')}:{os.getenv('POSTGRES_PORT', '5432')}/{os.getenv('POSTGRES_DB', 'exchange_db')}"
     )
 }
 
@@ -73,6 +74,8 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',},
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',},
 ]
+
+AUTH_USER_MODEL = 'users.CustomUser'
 
 # Internacionalización
 LANGUAGE_CODE = 'en-us'
@@ -93,3 +96,9 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Clave primaria por defecto
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}

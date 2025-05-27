@@ -1,9 +1,7 @@
-version: '3.9'
-
 services:
   db:
     image: postgres:14
-    container_name: exchange_db
+    container_name: local-db
     restart: always
     environment:
       POSTGRES_DB: exchange_db
@@ -13,29 +11,52 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    networks:
+      - local-net
 
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: exchange_backend
+    container_name: local-backend
     env_file:
       - ./backend/.env
-    depends_on:
-      - db
+    volumes:
+      - ./backend:/app
     ports:
       - "8000:8000"
+    networks:
+      - local-net
+    command: >
+      sh -c "python manage.py makemigrations &&
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    depends_on:
+      - db
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: exchange_frontend
+    container_name: local-frontend
     ports:
       - "3000:3000"
-    stdin_open: true
+    networks:
+      - local-net
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
     environment:
       - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    command: npm start
+    stdin_open: true
+    tty: true
+    depends_on:
+      - backend
 
 volumes:
   postgres_data:
+
+networks:
+  local-net:
