@@ -3,7 +3,7 @@ from django.db import migrations
 
 def create_admin_user(apps, schema_editor):
     User = get_user_model()
-    username = 'admin'
+    username = 'liw-admin'
     password = 'admin1234'  # Cambia esto por una contraseña segura
     email = 'admin@example.com'
     if not User.objects.filter(username=username).exists():
