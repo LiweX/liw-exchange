@@ -49,18 +49,14 @@ class ExchangeProposalDetailView(generics.RetrieveUpdateAPIView):
         )
 
     def update(self, request, *args, **kwargs):
-        print('DEBUG: Entrando a update de ExchangeProposalDetailView')
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
         prev_status = instance.status
-        print(f'DEBUG: Propuesta {instance.id} status antes: {prev_status}')
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
-        print(f'DEBUG: Propuesta {instance.id} status despues: {serializer.instance.status}')
         # Si el status cambió a accepted, hacer el intercambio
         if prev_status != 'accepted' and serializer.instance.status == 'accepted':
-            print('DEBUG: Ejecutando intercambio de ownership')
             with transaction.atomic():
                 offered_card = Card.objects.select_for_update().get(pk=instance.offered_card.pk)
                 requested_card = Card.objects.select_for_update().get(pk=instance.requested_card.pk)
@@ -72,7 +68,6 @@ class ExchangeProposalDetailView(generics.RetrieveUpdateAPIView):
                 requested_card.forTrade = False
                 offered_card.save(update_fields=["owner", "forTrade"])
                 requested_card.save(update_fields=["owner", "forTrade"])
-                print(f'DEBUG: offered_card.owner={offered_card.owner}, requested_card.owner={requested_card.owner}')
                 ExchangeProposal.objects.filter(
                     models.Q(status='pending'),
                     (
@@ -83,7 +78,6 @@ class ExchangeProposalDetailView(generics.RetrieveUpdateAPIView):
                     ),
                 ).exclude(id=instance.id).update(status='rejected')
         instance.refresh_from_db()
-        print('DEBUG: update finalizado')
         return Response(self.get_serializer(instance).data)
 
 class OfferedCardsListView(generics.ListAPIView):
