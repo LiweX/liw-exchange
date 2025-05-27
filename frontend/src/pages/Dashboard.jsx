@@ -3,7 +3,8 @@ import { Routes, Route } from "react-router-dom";
 import MyCards from "./MyCards";
 import ExchangeList from "./ExchangeList";
 import Profile from "./Profile";
-import AvailableCards from "./AvailableCards";
+import CardMarket from "./CardMarket";
+import AdminCards from "./AdminCards";
 
 export default function Dashboard() {
   return (
@@ -14,7 +15,8 @@ export default function Dashboard() {
           <Route path="cards" element={<MyCards />} />
           <Route path="exchanges" element={<ExchangeList />} />
           <Route path="profile" element={<Profile />} />
-          <Route path="available-cards" element={<AvailableCards />} />
+          <Route path="available-cards" element={<CardMarket />} />
+          <Route path="admin-cards" element={<AdminCards />} />
           <Route path="*" element={<MyCards />} />
         </Routes>
       </div>

@@ -3,6 +3,7 @@ from django.conf import settings
 
 class Card(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    creator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='created_cards')
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     verified = models.BooleanField(default=False)  # Aprobada por admin
@@ -12,6 +13,11 @@ class Card(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.owner.username}"
+
+    def save(self, *args, **kwargs):
+        if not self.creator:
+            self.creator = self.owner
+        super().save(*args, **kwargs)
 
 
 class ExchangeProposal(models.Model):

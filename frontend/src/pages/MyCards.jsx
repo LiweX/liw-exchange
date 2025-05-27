@@ -5,7 +5,7 @@ import CardItem from "../components/CardItem";
 import CardForm from "../components/CardForm";
 
 const MyCards = () => {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [cards, setCards] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
@@ -19,9 +19,16 @@ const MyCards = () => {
           Authorization: `Bearer ${token}`,
         },
       })
-      .then((res) => setCards(res.data))
+      .then((res) => {
+        // Si el usuario es admin, solo mostrar sus propias cartas en "Mis cartas"
+        if (user?.is_staff || user?.is_superuser) {
+          setCards(res.data.filter((card) => card.owner === user.username));
+        } else {
+          setCards(res.data);
+        }
+      })
       .catch((err) => console.error(err));
-  }, [token]);
+  }, [token, user]);
 
   const handleCreateCard = (data, resetForm) => {
     setFormLoading(true);
@@ -69,7 +76,7 @@ const MyCards = () => {
         </button>
       </div>
 
-      <div className="flex flex-row gap-14">
+      <div className="flex flex-wrap gap-8 items-stretch">
         {cards.map((card) => (
           <CardItem key={card.id} card={card} onOffer={handleOffer} />
         ))}
