@@ -58,12 +58,113 @@ Si corres las migraciones, se crea automáticamente:
   ```
 
 ## Funcionalidades principales
-- Registro y login de usuarios
-- Crear, editar y eliminar cartas
-- Ofrecer cartas para intercambio
-- Proponer, aceptar y rechazar intercambios
-- Panel de administración para verificar/borrar cartas (solo admin)
-- Edición de nombre y apellido en el perfil
+
+- **Registro y login de usuarios**: Crea tu cuenta, inicia sesión y gestiona tu perfil (nombre, apellido, email).
+- **Gestión de cartas**: Crea, edita y elimina tus cartas coleccionables. Cada carta tiene nombre, descripción, imagen, creador y dueño actual.
+- **Ofrecer cartas para intercambio**: Marca tus cartas como disponibles para intercambio.
+- **Mercado de cartas**: Visualiza todas las cartas disponibles para intercambio (excepto las tuyas) y ofrece intercambios.
+- **Propuestas de intercambio**: Propón intercambios a otros usuarios, acepta o rechaza propuestas recibidas, y visualiza el historial de intercambios completados.
+- **Panel de administración**: Los usuarios admin pueden ver todas las cartas, verificar cartas pendientes y borrar cualquier carta desde una interfaz especial.
+- **Verificación de cartas**: Solo las cartas verificadas por un admin pueden ser ofrecidas en el mercado.
+- **Historial y transparencia**: Cada carta mantiene su creador original y dueño actual, y puedes ver el estado de todas tus propuestas.
+
+## Ejemplos de uso de la API
+
+### Autenticación y perfil
+- **Obtener perfil actual:**
+  ```http
+  GET /users/me/
+  Authorization: Bearer <token>
+  ```
+- **Actualizar nombre y apellido:**
+  ```http
+  PATCH /users/me/
+  Content-Type: application/json
+  Authorization: Bearer <token>
+  {
+    "first_name": "Juan",
+    "last_name": "Pérez"
+  }
+  ```
+
+### Cartas
+- **Listar mis cartas:**
+  ```http
+  GET /exchange/cards/
+  Authorization: Bearer <token>
+  ```
+- **Crear carta:**
+  ```http
+  POST /exchange/cards/
+  Content-Type: application/json
+  Authorization: Bearer <token>
+  {
+    "name": "Carta Fuego",
+    "description": "Una carta poderosa",
+    "image_url": "https://..."
+  }
+  ```
+- **Marcar carta para intercambio:**
+  ```http
+  PATCH /exchange/cards/<id>/
+  Content-Type: application/json
+  Authorization: Bearer <token>
+  {
+    "forTrade": true
+  }
+  ```
+
+### Mercado e intercambios
+- **Ver cartas disponibles para intercambio:**
+  ```http
+  GET /exchange/offers/
+  Authorization: Bearer <token>
+  ```
+- **Proponer intercambio:**
+  ```http
+  POST /exchange/proposals/
+  Content-Type: application/json
+  Authorization: Bearer <token>
+  {
+    "offered_card_id": 1,
+    "requested_card_id": 2
+  }
+  ```
+- **Ver mis propuestas y recibidas:**
+  ```http
+  GET /exchange/proposals/
+  Authorization: Bearer <token>
+  ```
+- **Aceptar/rechazar propuesta:**
+  ```http
+  PATCH /exchange/proposals/<id>/
+  Content-Type: application/json
+  Authorization: Bearer <token>
+  {
+    "status": "accepted"
+  }
+  ```
+
+### Administración (solo admin)
+- **Ver todas las cartas:**
+  ```http
+  GET /exchange/cards/
+  Authorization: Bearer <token-admin>
+  ```
+- **Verificar carta:**
+  ```http
+  PATCH /exchange/cards/<id>/
+  Content-Type: application/json
+  Authorization: Bearer <token-admin>
+  {
+    "verified": true
+  }
+  ```
+- **Borrar carta:**
+  ```http
+  DELETE /exchange/cards/<id>/
+  Authorization: Bearer <token-admin>
+  ```
 
 ## Estructura del proyecto
 - `backend/`: Django + DRF + PostgreSQL
